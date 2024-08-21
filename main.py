@@ -4,6 +4,10 @@
 import pandas as pd
 from requests import get
 from bs4 import BeautifulSoup
+from datetime import datetime
+import pprint
+import os
+import json
 
 
 # function to scrape data from website
@@ -25,23 +29,25 @@ def get_data():
 
     # urls_list = ["https://www.walottery.com/Scratch/TopPrizesRemaining.aspx?price=$1"]
     for url in urls_list:
-        print(url)
         response = get(url)
         soup = BeautifulSoup(response.content, "html.parser")
         main = soup.select("#global-content > div > div > div > div")[0]
         for table in main.find_all("div", recursive=False):
             game_name = table.select("div > header > div > a")[0].text
-            game_price = table.select("div > header > div > p:nth-child(2)")[0].text
+            game_price = table.select("div > header > div > p:nth-child(2)")[
+                0
+            ].text  # need to sperate price out of the data
             data_table = pd.read_html(str(table.select("div > table")[0]))
+            # print((data_table[0]))
             Last_day = table.select("div > header > div > p:nth-child(3)")[0].text
             dictionary = {
+                "date": datetime.today().strftime("%m/%d/%Y"),
                 "game_name": game_name,
                 "game_price": game_price,
-                "data_table": data_table,
+                "data_table": data_table[0].to_dict("records"),
                 "Last_day": Last_day,
             }
             dict_list.append(dictionary)
-        print()
     return dict_list
 
 
@@ -51,4 +57,6 @@ def get_data():
 
 
 if __name__ == "__main__":
-    print(get_data())
+    x = get_data()
+    for y in x:
+        print(y["data_table"])
