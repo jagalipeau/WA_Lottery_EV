@@ -8,6 +8,7 @@ from datetime import datetime
 import pprint
 import os
 import json
+import Mongo
 
 
 # function to scrape data from website
@@ -57,6 +58,5 @@ def get_data():
 
 
 if __name__ == "__main__":
-    x = get_data()
-    for y in x:
-        print(y["data_table"])
+    data_full = get_data()
+    Mongo.update(data_full)
