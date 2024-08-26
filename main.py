@@ -12,19 +12,19 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import warnings
 
+# Muting FutureWarnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-# function to scrape data from website
-# returns a list of dictionaries that contain all needed data for analysis.
-
-
 def get_data():
+
+    # Setting up selenium
     options = webdriver.SafariOptions()
 
+    # Empty list to store finished dictionaries
     dict_list = []
-    game_id_list = []
 
+    # List of URLS where games are located. One url for each price of scrtacher
     urls_list = [
         "https://www.walottery.com/Scratch/TopPrizesRemaining.aspx?price=$1",
         "https://www.walottery.com/Scratch/TopPrizesRemaining.aspx?price=$2",
@@ -35,11 +35,12 @@ def get_data():
         "https://www.walottery.com/Scratch/TopPrizesRemaining.aspx?price=$30",
     ]
 
-    # urls_list = ["https://www.walottery.com/Scratch/TopPrizesRemaining.aspx?price=$1"]
+    # Looping through each url and downloaded html
     for url in urls_list:
         response = get(url)
         soup = BeautifulSoup(response.content, "html.parser")
         main = soup.select("#global-content > div > div > div > div")[0]
+        # Looping through each html table that exists in the download html above
         for table in main.find_all("div", recursive=False):
             game_name = table.select("div > header > div > a")[0].text
             game_price = table.select("div > header > div > p:nth-child(2)")[
@@ -49,14 +50,12 @@ def get_data():
             # print((data_table[0]))
             Last_day = table.select("div > header > div > p:nth-child(3)")[0].text
 
-            # -------------------------------
-
             game_id = table.select("div > header > div > p:nth-child(2)")[0].text[-4:]
-
+            # --- Begin selenium scraping. tickets sold is rendered not in the source code.
             url = f"https://www.walottery.com/Scratch/Explorer.aspx?id={game_id}"
             driver = webdriver.Safari(options=options)
-            driver.get(url)
             wait = WebDriverWait(driver, 10)
+            # Waiting until the tickets sold appears
             r = wait.until(
                 lambda driver: driver.find_element(
                     By.XPATH,
@@ -72,7 +71,7 @@ def get_data():
             driver.quit()
 
             # --------------------------------------------------------------------
-            # the value tickets sold is rendered using javascript. I may need to re scrape everything using selenium instead:/
+            # Creating dictionary for each game
             dictionary = {
                 "date": datetime.today().strftime("%m/%d/%Y"),
                 "game_name": game_name,
@@ -84,14 +83,16 @@ def get_data():
             print("table")
             dict_list.append(dictionary)
         print("url")
-
+    # returns a list of dictionaries
     return dict_list
 
 
-def calculate():
-    documents = Mongo.read_raw()
+# Returns Noithing. Adds to the Mongo DB the expected value for each game.
+def calculate(documents):
+    # Uncomment below to use every single game instead of ones passed to it
+    # documents = Mongo.read_raw()
     EV_dict_list = []
-
+    # Iterating through each of the games that is passed in
     for doc in documents:
         try:
             df = pd.DataFrame(doc["data_table"])
@@ -128,6 +129,7 @@ def calculate():
                 "EV": EV,
                 "ticket_price": ticket_price,
                 "tickets_sold": tickets_sold,
+                "data_table": df.to_dict("records"),
             }
             EV_dict_list.append(EV_dict)
         except:
@@ -138,6 +140,7 @@ def calculate():
 
 
 if __name__ == "__main__":
-    # data_full = get_data()
-    # Mongo.update(data_full, collectionName="full_data")
-    calculate()
+    data_full = get_data()
+    Mongo.update(data_full, collectionName="full_data")
+    calculate(data_full)
+    # calculate()
