@@ -42,7 +42,7 @@ def get_data():
         main = soup.select("#global-content > div > div > div > div")[0]
         # Looping through each html table that exists in the download html above
         for table in main.find_all("div", recursive=False):
-            game_name = table.select("div > header > div > a")[0].text
+
             game_price = table.select("div > header > div > p:nth-child(2)")[
                 0
             ].text  # need to sperate price out of the data
@@ -51,10 +51,12 @@ def get_data():
             Last_day = table.select("div > header > div > p:nth-child(3)")[0].text
 
             game_id = table.select("div > header > div > p:nth-child(2)")[0].text[-4:]
+            game_name = f'{table.select("div > header > div > a")[0].text} ({game_id})'
             # --- Begin selenium scraping. tickets sold is rendered not in the source code.
             url = f"https://www.walottery.com/Scratch/Explorer.aspx?id={game_id}"
             driver = webdriver.Safari(options=options)
-            wait = WebDriverWait(driver, 10)
+            driver.get(url)
+            wait = WebDriverWait(driver, 30)
             # Waiting until the tickets sold appears
             r = wait.until(
                 lambda driver: driver.find_element(
