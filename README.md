@@ -67,6 +67,10 @@ This will:
 - The script will continuously monitor for changes in ticket data
 - Notifications will be sent when profitable opportunities are detected
 
+## Screenshot
+![Streamlit Table Interface](screenshot.png)
+*Screenshot of the lottery data analysis table in Streamlit*
+
 ## Development
 
 ### Adding New Features
