@@ -55,5 +55,29 @@ def read_raw():
     return documents
 
 
+# Define a function to check if the MongoDB database is up and running
+def is_database_running():
+    """
+    Checks if the 'Wa_Lotto' MongoDB database can be connected.
+
+    Returns:
+        bool: True if the connection was successful, False otherwise.
+    """
+
+    try:
+        # Connect to MongoDB using pymongo library
+        client = pymongo.MongoClient("mongodb://mongoadmin:pass@localhost:27017/")
+
+        # Check if the connection attempt returns a client object
+        if client and hasattr(client, "database"):
+            print("Database connected successfully.")
+            return True
+
+    except Exception as e:
+        # Handle any exceptions that occur during connection
+        print(f"Failed to connect to database: {str(e)}")
+        return False
+
+
 # Call the update function with the fake car data
 # update(database, main.get_data())
