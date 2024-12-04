@@ -142,7 +142,9 @@ def calculate(documents):
 
 
 if __name__ == "__main__":
-    data_full = get_data()
-    Mongo.update(data_full, collectionName="full_data")
-    calculate(data_full)
+    if Mongo.is_database_running() == True:
+        data_full = get_data()
+        Mongo.update(data_full, collectionName="full_data")
+        calculate(data_full)
+
     # calculate()
