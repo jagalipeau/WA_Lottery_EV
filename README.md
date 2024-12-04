@@ -99,5 +99,4 @@ This will:
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Contact
-[Add your contact information here]
+
