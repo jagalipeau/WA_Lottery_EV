@@ -20,8 +20,8 @@ A Python-based tool that scrapes Washington State lottery scratch ticket data an
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/WA_lotto_scratcher.git
-   cd WA_lotto_scratcher
+   git clone https://github.com/yourusername/WA_Lottery_EV.git
+   cd WA_Lottery_EV
    ```
 
 2. Install required dependencies:
